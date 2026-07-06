@@ -1,6 +1,6 @@
 # NBA Minutes Played Analysis
 
-Can a player's on-court statistics predict whether their playing time is actually deserved — and does that relate to team success?
+Can a player's on-court statistics predict whether their playing time is actually deserved, and how much does that relate to team success?
 
 ## Overview
 
@@ -18,17 +18,17 @@ Using 20 years of NBA player statistics, this project explores whether the amoun
 ## Exploratory Analysis
 
 **Points vs. Minutes Played, colored by team win %**
-Outliers in minutes or scoring tend to correlate with *lower* winning percentages — suggesting over-reliance on one or two players may hurt team success more than it helps.
+Outliers in minutes or scoring tend to correlate with *lower* winning percentages, suggesting over-reliance on one or two players may hurt team success more than it helps.
 
 ![Points vs Minutes scatterplot](figures/scatterplot_pts_vs_minutes.jpg)
 
 **Minutes Played distribution by team**
-Successful teams (Milwaukee, Miami, Boston) tend to show a plateau at the top of their minutes distribution — a more even rotation. Weaker teams (Atlanta, Brooklyn, Orlando) show an outlying hump, suggesting heavier reliance on fewer players.
+Successful teams (Milwaukee, Miami, Boston) tend to show a plateau at the top of their minutes distribution, showing a more even rotation. Weaker teams (Atlanta, Brooklyn, Orlando) show an outlying hump, suggesting heavier reliance on fewer players.
 
 ![Density plot by team](figures/density_minutes_by_team.jpg)
 
 **League-wide distribution of minutes played**
-Right-skewed, as expected — most players are role players (10-15 min/game), with a small number of high-minute stars.
+Right-skewed, as expected, displaying that most players are role players (10-15 min/game), with a small number of high-minute stars.
 
 ![Histogram of minutes played](figures/histogram_minutes_distribution.jpg)
 
