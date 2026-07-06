@@ -1,0 +1,136 @@
+---
+title: "Models"
+output: pdf_document
+date: "2023-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+#set up libraries
+library(caret)
+library(ggplot2)
+library('naivebayes')
+library('C50')
+library(Metrics)
+library('tinytex')
+
+#Open file
+# Set your working directory to the folder containing NBAPlayerData.csv
+# setwd("path/to/your/data")
+nbadf <- read.csv('NBAPlayerData.csv')
+```
+
+
+
+##create training and testing datasets
+
+```{r}
+sample_size <- floor(0.8*nrow(nbadf))
+#check size
+sample_size
+
+# Identify constant variables
+constant_vars <- sapply(nbadf, function(x) length(unique(x)) == 1)
+
+# Exclude constant variables
+nbadf <- nbadf[, !constant_vars]
+
+# get train data index
+train_ind <- sample(seq_len(nrow(nbadf)), size = sample_size)
+# generate training and test dataset
+train <- nbadf[train_ind,]
+test <- nbadf[-train_ind,]
+
+#remove empty values
+train <- train[complete.cases(train),]
+test <- test[complete.cases(test),]
+
+#set cross validation method: ## 5-fold CV , repeated two times
+fitControl <- trainControl(method = "repeatedcv", number = 5, repeats = 2)
+```
+
+
+
+## model #1: gaussian kernel
+
+```{r}
+## svm with gaussian kernel
+svmradial <- train(MP ~ X3P.+eFG.+TRB+AST+STL+BLK+PTS, data = train,
+                   method = "svmRadial",
+                   trControl = fitControl)
+#apply model and evaluate prediction results for svm gaussian
+prediction_svmgaussian <- predict(svmradial, newdata = test)
+rmse(prediction_svmgaussian,test$MP)
+```
+
+
+
+## model #2: Linear Regression
+```{r}
+lm_model <- lm(MP ~ X3P. + eFG. + TRB + AST + STL + BLK + PTS, data = train)
+
+# Extract summary
+summary(lm_model)
+```
+
+
+##convert continuous minutes played values to labels by using a 75 percent threshold
+```{r}
+threshold <- quantile(nbadf$MP, 0.75)
+nbadf$MP <- factor(with(nbadf, ifelse(nbadf$MP <= threshold, 'low', 'high')))
+
+# now check number of smaples in each category
+table(nbadf$MP)
+
+
+
+##create training and testing datasets
+
+sample_size <- floor(0.8*nrow(nbadf))
+#check size
+sample_size
+
+# Identify constant variables
+constant_vars <- sapply(nbadf, function(x) length(unique(x)) == 1)
+
+# Exclude constant variables
+nbadf <- nbadf[, !constant_vars]
+
+# get train data index
+train_ind <- sample(seq_len(nrow(nbadf)), size = sample_size)
+# generate training and test dataset
+train <- nbadf[train_ind,]
+test <- nbadf[-train_ind,]
+
+#remove empty values
+train <- train[complete.cases(train),]
+test <- test[complete.cases(test),]
+
+#set cross validation method: ## 5-fold CV , repeated two times
+fitControl <- trainControl(method = "repeatedcv", number = 5, repeats = 2)
+```
+
+
+
+
+
+##Model #3: Decision tree
+```{r}
+# Decision tree
+svmradial2 <- train(MP ~ X3P.+eFG.+TRB+AST+STL+BLK+PTS, data = train,
+                   method = "C5.0", trControl = fitControl)
+#apply model and evaluate prediction results for decision tree
+prediction_dectree <- predict(svmradial2, newdata = test)
+confusionMatrix(prediction_dectree,test$MP)
+```
+
+

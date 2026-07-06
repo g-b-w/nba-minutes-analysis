@@ -1,0 +1,87 @@
+---
+title: "Exploratory Analysis"
+output: pdf_document
+date: "2023-12-05"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r}
+#set up libraries
+library(caret)
+library(ggplot2)
+library('naivebayes')
+library('C50')
+
+
+#Open file
+# Set your working directory to the folder containing NBAPlayerData.csv
+# setwd("path/to/your/data")
+nbadf <- read.csv('NBAPlayerData.csv')
+```
+
+
+#statistical summary of data
+```{r}
+summary(nbadf)
+```
+
+
+##visualization plot #1: scatterplot for points per game on x axis and Minutes played
+##on the y axis. Colored by team
+```{r}
+ggplot(data = nbadf)+
+  geom_point(mapping = aes(x = PTS , y = MP, color = W.L.), size = 1) +
+  labs(title = "NBA Player Points vs Minutes Played",
+       x = "Points (PTS)",
+       y = "Minutes Played (MP)")
+```
+
+##visualization plot #2: Density plot of minutes played per team
+```{r}
+ggplot(nbadf, aes(x = MP, fill = Tm)) +
+  geom_density(aes(y = ..density..)) +
+  facet_wrap(~ Tm) +
+  labs(title = "Density Plot of Minutes Played by Team", x = "Minutes Played", y = "Density")
+  
+```
+
+##visualization plot #3: Histogram showing the distribution of minutes played throughout the league
+```{r}
+ggplot(nbadf, aes(x = MP)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black") +
+  labs(title = "Distribution of Minutes Played", x = "Minutes Played", y = "Frequency")
+```
+
+#statistical test #1: 
+```{r}
+teamA <- nbadf[nbadf$Tm  %in% c("LAL"), ]$MP
+teamB <- nbadf[nbadf$Tm %in% c("WAS"), ]$MP
+t.test(teamA, teamB)
+```
+
+
+#statistical test #2:
+```{r}
+nbadf$GB <- as.factor(nbadf$GB)
+nbadf$W.L. <- as.factor(nbadf$W.L.)
+
+# Perform two-way ANOVA
+result_anova <- aov(MP ~ GB + W.L., data = nbadf)
+print(result_anova)
+```
+
+
+
+
+
+
+
